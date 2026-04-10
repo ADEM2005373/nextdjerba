@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Join the biggest technology battle — compete in Solid Work, Problem Solving, and Green Entrepreneurial hackathons. Register your team now!">
+  <title>Tech Battle — The Biggest Technology Hackathon</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232563EB'/%3E%3Cstop offset='100%25' stop-color='%237C3AED'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='18' fill='%230a0e1a'/%3E%3Cpath d='M50 8 L85 28 L85 72 L50 92 L15 72 L15 28 Z' fill='url(%23g)' stroke='%230a0e1a' stroke-width='4'/%3E%3Cpath d='M55 22 L38 52 L50 52 L45 78 L65 45 L52 45 Z' fill='%230a0e1a' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <!-- Preconnect to Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="loading" data-theme="solidwork">
+
+  <!-- ============================================
+       LOADING SCREEN
+       ============================================ -->
+  <div id="loader">
+    <canvas id="loader-canvas"></canvas>
+    <div class="loader-content">
+      <!-- Logo with spinning energy rings -->
+      <div class="loader-logo-wrapper">
+        <div class="loader-logo-ring-3"></div>
+        <div class="loader-logo-ring-2"></div>
+        <div class="loader-logo-ring"></div>
+        <svg class="loader-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#2563EB"/>
+              <stop offset="50%" style="stop-color:#7C3AED"/>
+              <stop offset="100%" style="stop-color:#059669"/>
+            </linearGradient>
+            <filter id="logoGlow">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <polygon points="100,10 190,60 190,140 100,190 10,140 10,60" fill="none" stroke="url(#logoGrad)" stroke-width="4" filter="url(#logoGlow)"/>
+          <polygon points="100,30 170,68 170,132 100,170 30,132 30,68" fill="none" stroke="url(#logoGrad)" stroke-width="2" opacity="0.5"/>
+          <text x="100" y="92" text-anchor="middle" fill="url(#logoGrad)" font-family="Orbitron,monospace" font-size="24" font-weight="900" filter="url(#logoGlow)">TECH</text>
+          <text x="100" y="122" text-anchor="middle" fill="url(#logoGrad)" font-family="Orbitron,monospace" font-size="24" font-weight="900" filter="url(#logoGlow)">BATTLE</text>
+          <circle cx="100" cy="100" r="85" fill="none" stroke="url(#logoGrad)" stroke-width="1" opacity="0.15">
+            <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="20s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="100" cy="100" r="92" fill="none" stroke="url(#logoGrad)" stroke-width="0.5" opacity="0.08" stroke-dasharray="8 12">
+            <animateTransform attributeName="transform" type="rotate" from="360 100 100" to="0 100 100" dur="15s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </div>
+
+      <!-- Main quote with typewriter -->
+      <div class="loader-quote">Welcome to the biggest technology battle !!</div>
+
+      <!-- Sub-quote that fades in later -->
+      <div class="loader-subquote">⚡ Prepare for combat ⚡</div>
+
+      <!-- Energy progress bar -->
+      <div class="loader-bar-container">
+        <div class="loader-bar" id="loader-bar"></div>
+      </div>
+      <div class="loader-percent" id="loader-percent">0%</div>
+
+      <!-- Battle status -->
+      <div class="loader-status" id="loader-status">Initializing battle systems...</div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       MAIN SITE
+       ============================================ -->
+  <div id="main-site">
+
+    <!-- Background Canvas -->
+    <canvas id="theme-canvas"></canvas>
+
+    <!-- ========== NAVBAR / HACKATHON SELECTOR ========== -->
+    <nav class="hackathon-nav" id="main-nav">
+      <div class="container">
+        <div class="nav-inner">
+          <button class="nav-btn active" data-theme="solidwork" id="nav-solidwork">
+            Solid Work
+          </button>
+          <button class="nav-btn" data-theme="problemsolving" id="nav-problemsolving">
+            Problem Solving
+          </button>
+          <button class="nav-btn" data-theme="green" id="nav-green">
+            Green Entrepreneurial
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ========== HERO SECTION ========== -->
+    <section class="hero" id="hero">
+      <div class="container">
+        <div class="hero-content" id="hero-content">
+          <!-- Dynamically rendered by theme.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== ABOUT SECTION ========== -->
+    <section class="about reveal" id="about">
+      <div class="container" id="about-content">
+        <!-- Dynamically rendered by theme.js -->
+      </div>
+    </section>
+
+    <!-- ========== MOTIVATION SECTION ========== -->
+    <section class="motivation reveal" id="motivation">
+      <div class="container" id="motivation-content">
+        <!-- Dynamically rendered by theme.js -->
+      </div>
+    </section>
+
+    <!-- ========== PRIZES SECTION ========== -->
+    <section class="prizes reveal" id="prizes">
+      <div class="container" id="prizes-content">
+        <!-- Dynamically rendered by theme.js -->
+      </div>
+    </section>
+
+    <!-- ========== REGISTRATION SECTION ========== -->
+    <section class="registration reveal" id="registration">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 48px;">
+          <span class="section-label">Join the Battle</span>
+          <h2 class="section-title">Register Your Team</h2>
+          <div class="solo-badge" id="solo-badge" style="display: none;">
+            🎯 Solo Challenge — No teammates needed
+          </div>
+        </div>
+
+        <div class="form-wrapper">
+          <form id="registration-form" novalidate>
+
+            <!-- Hackathon Selection -->
+            <div class="form-section-title">
+              <span class="section-number">1</span>
+              Choose Your Hackathon
+            </div>
+
+            <div class="hackathon-select-group">
+              <label for="hackathon-select">Hackathon</label>
+              <select id="hackathon-select" name="hackathon" required>
+                <option value="">Select a hackathon</option>
+                <option value="Solid Work">Solid Work</option>
+                <option value="Problem Solving">Problem Solving</option>
+                <option value="Green Entrepreneurial">Green Entrepreneurial</option>
+              </select>
+            </div>
+
+            <!-- Team Leader Info -->
+            <div class="form-section-title">
+              <span class="section-number">2</span>
+              Team Leader Information
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="fname">First Name</label>
+                <input type="text" id="fname" name="firstName" placeholder="Your first name" required>
+              </div>
+              <div class="form-group">
+                <label for="lname">Last Name</label>
+                <input type="text" id="lname" name="lastName" placeholder="Your last name" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dept">Department</label>
+                <select id="dept" name="department" required>
+                  <option value="">Select department</option>
+                  <option value="IT">IT</option>
+                  <option value="GE">GE</option>
+                  <option value="ME">ME</option>
+                  <option value="GES">GES</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="student-class">Class</label>
+                <input type="text" id="student-class" name="class" placeholder="e.g. 2CP, 1CS" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="student-id">Student ID</label>
+                <input type="text" id="student-id" name="studentId" placeholder="Your student ID" required>
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+              </div>
+            </div>
+
+            <!-- Teammates -->
+            <div class="form-section-title">
+              <span class="section-number">3</span>
+              Teammates
+            </div>
+
+            <div id="teammates-container">
+              <!-- Teammate blocks added dynamically -->
+            </div>
+
+            <button type="button" class="add-teammate-btn" id="add-teammate">
+              + Add Teammate
+            </button>
+
+            <!-- Submit -->
+            <button type="submit" class="submit-btn" id="submit-btn">
+              Submit Registration
+            </button>
+
+            <div class="form-message" id="form-message"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Tech Battle. Made with <span class="heart">❤</span> for innovators.</p>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Scripts (loaded at end for performance) -->
+  <script src="js/loader.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/form.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,345 @@
+/* ============================================
+   FORM HANDLER — Validation + Google Sheets
+   ============================================ */
+
+(function () {
+  'use strict';
+
+  // ===========================================================
+  // IMPORTANT: Replace this URL with your Google Apps Script URL
+  // ===========================================================
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlfBeeE-7fhwrxlRb-YvNj_K0AP-uxx49dRPLiT7KpUYtlhxUxEL6kGpgujdO5y0gi/exec';
+
+  const form = document.getElementById('registration-form');
+  const addTeammateBtn = document.getElementById('add-teammate');
+  const teammatesContainer = document.getElementById('teammates-container');
+  const formMessage = document.getElementById('form-message');
+  const submitBtn = document.getElementById('submit-btn');
+  const hackathonSelect = document.getElementById('hackathon-select');
+
+  // Teammates section title (section #3)
+  const teammatesSectionTitle = document.querySelectorAll('.form-section-title')[2]; // 3rd section title
+
+  let teammateCount = 0;
+  const MAX_TEAMMATES = 4;
+
+  // --- Solo hackathon detection ---
+  const SOLO_HACKATHONS = ['Solid Work'];
+
+  function isSoloHackathon(value) {
+    return SOLO_HACKATHONS.includes(value);
+  }
+
+  // --- Toggle Teammates Section ---
+  const soloBadge = document.getElementById('solo-badge');
+  // Wrapper for teammates section elements to animate together
+  const teammatesWrapper = [teammatesSectionTitle, teammatesContainer, addTeammateBtn];
+
+  function toggleTeammatesSection(hackathonValue) {
+    const solo = isSoloHackathon(hackathonValue);
+
+    if (solo) {
+      // Clear any existing teammates
+      teammatesContainer.innerHTML = '';
+      teammateCount = 0;
+
+      // Slide-hide teammates UI with animation
+      teammatesWrapper.forEach(el => {
+        if (el) el.classList.add('teammates-hidden');
+      });
+
+      // Show solo badge
+      if (soloBadge) {
+        soloBadge.style.display = 'block';
+        // Trigger reflow for animation
+        soloBadge.offsetHeight;
+        soloBadge.classList.add('visible');
+      }
+
+      // Update form title
+      document.querySelector('.registration .section-title').textContent = 'Solo Registration';
+      // Update leader section title
+      const leaderSectionTitle = document.querySelectorAll('.form-section-title')[1];
+      if (leaderSectionTitle) {
+        leaderSectionTitle.innerHTML = '<span class="section-number">2</span> Your Information';
+      }
+    } else {
+      // Slide-show teammates UI with animation
+      teammatesWrapper.forEach(el => {
+        if (el) el.classList.remove('teammates-hidden');
+      });
+
+      // Hide solo badge
+      if (soloBadge) {
+        soloBadge.classList.remove('visible');
+        setTimeout(() => { soloBadge.style.display = 'none'; }, 400);
+      }
+
+      // Restore form title
+      document.querySelector('.registration .section-title').textContent = 'Register Your Team';
+      // Restore leader section title
+      const leaderSectionTitle = document.querySelectorAll('.form-section-title')[1];
+      if (leaderSectionTitle) {
+        leaderSectionTitle.innerHTML = '<span class="section-number">2</span> Team Leader Information';
+      }
+    }
+  }
+
+  // --- Rate limiting ---
+  let lastSubmitTime = 0;
+  const SUBMIT_COOLDOWN = 10000; // 10 seconds
+
+  // --- Sanitize input ---
+  function sanitize(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML.trim();
+  }
+
+  // --- Validate Email ---
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  // --- Create Teammate Block ---
+  function createTeammateBlock() {
+    if (teammateCount >= MAX_TEAMMATES) {
+      showMessage('Maximum of ' + MAX_TEAMMATES + ' teammates allowed.', 'error');
+      return;
+    }
+
+    teammateCount++;
+    const num = teammateCount;
+
+    const block = document.createElement('div');
+    block.className = 'teammate-block';
+    block.id = `teammate-${num}`;
+    block.innerHTML = `
+      <div class="teammate-header">
+        <span class="teammate-label">Teammate #${num}</span>
+        <button type="button" class="remove-teammate" data-id="${num}">Remove</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tm-fname-${num}">First Name</label>
+          <input type="text" id="tm-fname-${num}" name="tm_fname_${num}" placeholder="First name" required>
+        </div>
+        <div class="form-group">
+          <label for="tm-lname-${num}">Last Name</label>
+          <input type="text" id="tm-lname-${num}" name="tm_lname_${num}" placeholder="Last name" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tm-dept-${num}">Department</label>
+          <select id="tm-dept-${num}" name="tm_dept_${num}" required>
+            <option value="">Select department</option>
+            <option value="IT">IT</option>
+            <option value="GE">GE</option>
+            <option value="ME">ME</option>
+            <option value="GES">GES</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="tm-class-${num}">Class</label>
+          <input type="text" id="tm-class-${num}" name="tm_class_${num}" placeholder="e.g. 2CP, 1CS" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tm-id-${num}">Student ID</label>
+          <input type="text" id="tm-id-${num}" name="tm_id_${num}" placeholder="Student ID" required>
+        </div>
+        <div class="form-group">
+          <label for="tm-email-${num}">Email</label>
+          <input type="email" id="tm-email-${num}" name="tm_email_${num}" placeholder="email@example.com" required>
+        </div>
+      </div>
+    `;
+
+    teammatesContainer.appendChild(block);
+
+    // Remove handler
+    block.querySelector('.remove-teammate').addEventListener('click', () => {
+      block.remove();
+      teammateCount--;
+      updateTeammateNumbers();
+    });
+  }
+
+  // --- Re-number teammates after removal ---
+  function updateTeammateNumbers() {
+    const blocks = teammatesContainer.querySelectorAll('.teammate-block');
+    blocks.forEach((block, idx) => {
+      const num = idx + 1;
+      block.querySelector('.teammate-label').textContent = `Teammate #${num}`;
+    });
+  }
+
+  // --- Show Message ---
+  function showMessage(text, type) {
+    formMessage.textContent = text;
+    formMessage.className = 'form-message ' + type;
+    formMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function hideMessage() {
+    formMessage.className = 'form-message';
+    formMessage.textContent = '';
+  }
+
+  // --- Collect Form Data ---
+  function collectFormData() {
+    const data = {
+      hackathon: sanitize(document.getElementById('hackathon-select').value),
+      firstName: sanitize(document.getElementById('fname').value),
+      lastName: sanitize(document.getElementById('lname').value),
+      department: sanitize(document.getElementById('dept').value),
+      class: sanitize(document.getElementById('student-class').value),
+      studentId: sanitize(document.getElementById('student-id').value),
+      email: sanitize(document.getElementById('email').value),
+      teammates: []
+    };
+
+    const blocks = teammatesContainer.querySelectorAll('.teammate-block');
+    blocks.forEach((block, idx) => {
+      const num = idx + 1;
+      const tmBlock = block;
+      data.teammates.push({
+        firstName: sanitize(tmBlock.querySelector(`[name^="tm_fname"]`).value),
+        lastName: sanitize(tmBlock.querySelector(`[name^="tm_lname"]`).value),
+        department: sanitize(tmBlock.querySelector(`[name^="tm_dept"]`).value),
+        class: sanitize(tmBlock.querySelector(`[name^="tm_class"]`).value),
+        studentId: sanitize(tmBlock.querySelector(`[name^="tm_id"]`).value),
+        email: sanitize(tmBlock.querySelector(`[name^="tm_email"]`).value)
+      });
+    });
+
+    return data;
+  }
+
+  // --- Validate ---
+  function validate(data) {
+    if (!data.hackathon) return 'Please select a hackathon.';
+    if (!data.firstName) return 'Please enter your first name.';
+    if (!data.lastName) return 'Please enter your last name.';
+    if (!data.department) return 'Please select your department.';
+    if (!data.class) return 'Please enter your class.';
+    if (!data.studentId) return 'Please enter your student ID.';
+    if (!data.email) return 'Please enter your email.';
+    if (!isValidEmail(data.email)) return 'Please enter a valid email address.';
+
+    for (let i = 0; i < data.teammates.length; i++) {
+      const tm = data.teammates[i];
+      if (!tm.firstName || !tm.lastName || !tm.department || !tm.class || !tm.studentId || !tm.email) {
+        return `Please fill in all fields for Teammate #${i + 1}.`;
+      }
+      if (!isValidEmail(tm.email)) {
+        return `Invalid email for Teammate #${i + 1}.`;
+      }
+    }
+
+    return null;
+  }
+
+  // --- Submit to Google Sheets ---
+  async function submitToGoogleSheets(data) {
+    // Flatten data for spreadsheet
+    const payload = {
+      timestamp: new Date().toISOString(),
+      hackathon: data.hackathon,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      department: data.department,
+      class: data.class,
+      studentId: data.studentId,
+      email: data.email,
+      teammateCount: data.teammates.length
+    };
+
+    // Add teammate data
+    data.teammates.forEach((tm, i) => {
+      const n = i + 1;
+      payload[`tm${n}_firstName`] = tm.firstName;
+      payload[`tm${n}_lastName`] = tm.lastName;
+      payload[`tm${n}_department`] = tm.department;
+      payload[`tm${n}_class`] = tm.class;
+      payload[`tm${n}_studentId`] = tm.studentId;
+      payload[`tm${n}_email`] = tm.email;
+    });
+
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Unauthorized. Please ensure the Apps Script Web App "Who has access" is set to "Anyone".');
+      }
+      throw new Error(`Network response was not ok: ${response.status}`);
+    }
+
+    return await response.json();
+  }
+
+  // --- Event Listeners ---
+  addTeammateBtn.addEventListener('click', createTeammateBlock);
+
+  // --- Hackathon selection change → toggle teammates ---
+  hackathonSelect.addEventListener('change', () => {
+    toggleTeammatesSection(hackathonSelect.value);
+  });
+
+  // Initialize on load (in case a hackathon is pre-selected)
+  toggleTeammatesSection(hackathonSelect.value);
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMessage();
+
+    // Rate limiting
+    const now = Date.now();
+    if (now - lastSubmitTime < SUBMIT_COOLDOWN) {
+      showMessage('Please wait a moment before submitting again.', 'error');
+      return;
+    }
+
+    const data = collectFormData();
+    const error = validate(data);
+
+    if (error) {
+      showMessage(error, 'error');
+      return;
+    }
+
+    // Disable submit
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'SUBMITTING...';
+
+    try {
+      if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+        // Demo mode — no real submission
+        await new Promise(r => setTimeout(r, 1500));
+        showMessage('⚠️ Demo Mode: Form validated successfully! Connect a Google Sheet to save data. Check the README for setup instructions.', 'success');
+      } else {
+        await submitToGoogleSheets(data);
+        showMessage('🎉 Registration submitted successfully! We\'ll be in touch soon.', 'success');
+        form.reset();
+        teammatesContainer.innerHTML = '';
+        teammateCount = 0;
+      }
+
+      lastSubmitTime = now;
+    } catch (err) {
+      console.error('Submission error:', err);
+      showMessage('Something went wrong. Please try again later.', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'SUBMIT REGISTRATION';
+    }
+  });
+})();
