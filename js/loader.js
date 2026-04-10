@@ -384,7 +384,9 @@
         const dx = node.x - other.x;
         const dy = node.y - other.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const maxDist = isMobile ? 70 : 120;
+        if (dist < maxDist) {
           ctx.beginPath();
           ctx.moveTo(node.x, node.y);
           // Right angle connection for circuit feel
@@ -522,7 +524,10 @@
   // ===================================
   // INIT ALL ELEMENTS
   // ===================================
-  const numParticles = Math.min(80, Math.floor((canvas.width * canvas.height) / 18000));
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const numParticles = isMobile 
+    ? Math.min(40, Math.floor((canvas.width * canvas.height) / 36000))
+    : Math.min(80, Math.floor((canvas.width * canvas.height) / 18000));
   for (let i = 0; i < numParticles; i++) {
     particles.push(new Particle());
   }
