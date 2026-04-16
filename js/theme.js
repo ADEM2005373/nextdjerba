@@ -18,15 +18,15 @@
         'Whether you\'re a backend wizard, frontend artist, or full-stack warrior — this is your arena. Teams of up to 5 will compete to build the most solid, deployable solution within the time limit.'
       ],
       stats: [
-        { number: '24H', label: 'Non-Stop' },
-        { number: '50+', label: 'Teams' },
-        { number: '5K', label: 'Prize Pool' }
+        { number: '7H', label: 'Non-Stop' },
+        { number: '15', label: 'Participants' },
+        { number: 'to set later', label: 'Prize Pool' }
       ],
       motivation: 'The only way to do great work is to love what you do. This hackathon isn\'t just about winning — it\'s about pushing your limits, learning from brilliant peers, and building something you\'re genuinely proud of. Every line of code you write here is a step towards becoming the engineer you aspire to be.',
       prizes: [
-        { rank: '1st Place', amount: '2,500 DZD', desc: 'Trophy + Certificate + Mentorship opportunity', icon: '🏆' },
-        { rank: '2nd Place', amount: '1,500 DZD', desc: 'Trophy + Certificate + Tech gadgets', icon: '🥈' },
-        { rank: '3rd Place', amount: '1,000 DZD', desc: 'Certificate + Tech accessories', icon: '🥉' }
+        { rank: '1st Place', amount: 'to set later', desc: 'Trophy + Certificate + Mentorship opportunity', icon: '🏆' },
+        { rank: '2nd Place', amount: 'to set later', desc: 'Trophy + Certificate + Tech gadgets', icon: '🥈' },
+        { rank: '3rd Place', amount: 'to set later', desc: 'Certificate + Tech accessories', icon: '🥉' }
       ]
     },
     problemsolving: {
@@ -41,14 +41,14 @@
       ],
       stats: [
         { number: '12H', label: 'Challenge' },
-        { number: '100+', label: 'Problems' },
-        { number: '3K', label: 'Prize Pool' }
+        { number: '20+', label: 'Problems' },
+        { number: 'to set later', label: 'Prize Pool' }
       ],
       motivation: 'Every expert was once a beginner. Every complex problem can be broken down into simpler pieces. In this hackathon, you\'ll discover that the greatest obstacle isn\'t the problem itself — it\'s the belief that you can\'t solve it. Step up, break through your mental barriers, and amaze yourself.',
       prizes: [
-        { rank: '1st Place', amount: '1,500 DZD', desc: 'Trophy + Certificate + Coding bootcamp access', icon: '🏆' },
-        { rank: '2nd Place', amount: '1,000 DZD', desc: 'Trophy + Certificate + Online course bundle', icon: '🥈' },
-        { rank: '3rd Place', amount: '500 DZD', desc: 'Certificate + Programming books', icon: '🥉' }
+        { rank: '1st Place', amount: 'to set later', desc: 'Trophy + Certificate + Coding bootcamp access', icon: '🏆' },
+        { rank: '2nd Place', amount: 'to set later', desc: 'Trophy + Certificate + Online course bundle', icon: '🥈' },
+        { rank: '3rd Place', amount: 'to set later', desc: 'Certificate + Programming books', icon: '🥉' }
       ]
     },
     green: {
@@ -63,14 +63,14 @@
       ],
       stats: [
         { number: '48H', label: 'Duration' },
-        { number: '30+', label: 'Startups' },
-        { number: '8K', label: 'Prize Pool' }
+        { number: '15+', label: 'Teams' },
+        { number: 'to set later', label: 'Prize Pool' }
       ],
       motivation: 'The future belongs to those who dare to dream green. Technology has the power to heal our planet — and YOU have the power to wield that technology. This hackathon isn\'t just a competition; it\'s a movement. Join us, and let your innovation become the seed of a sustainable tomorrow.',
       prizes: [
-        { rank: '1st Place', amount: '4,000 DZD', desc: 'Trophy + Incubator access + Seed funding', icon: '🏆' },
-        { rank: '2nd Place', amount: '2,500 DZD', desc: 'Trophy + Certificate + Mentorship program', icon: '🥈' },
-        { rank: '3rd Place', amount: '1,500 DZD', desc: 'Certificate + Business development resources', icon: '🥉' }
+        { rank: '1st Place', amount: 'to set later', desc: 'Trophy + Incubator access + Seed funding', icon: '🏆' },
+        { rank: '2nd Place', amount: 'to set later', desc: 'Trophy + Certificate + Mentorship program', icon: '🥈' },
+        { rank: '3rd Place', amount: 'to set later', desc: 'Certificate + Business development resources', icon: '🥉' }
       ]
     }
   };
