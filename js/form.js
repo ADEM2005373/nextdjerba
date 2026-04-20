@@ -15,13 +15,25 @@
   const teammatesContainer = document.getElementById('teammates-container');
   const formMessage = document.getElementById('form-message');
   const submitBtn = document.getElementById('submit-btn');
-  const hackathonSelect = document.getElementById('hackathon-select');
 
-  // Teammates section title (section #3)
-  const teammatesSectionTitle = document.querySelectorAll('.form-section-title')[2]; // 3rd section title
+  // Teammates section title (section #2, now that hackathon selection was removed)
+  const teammatesSectionTitle = document.querySelectorAll('.form-section-title')[1]; // 2nd section title
 
   let teammateCount = 0;
-  const MAX_TEAMMATES = 4;
+
+  // --- Theme to hackathon name mapping ---
+  const themeToHackathon = {
+    solidwork: 'Solid Work',
+    problemsolving: 'Problem Solving',
+    green: 'Green Entrepreneurial'
+  };
+
+  // --- Teammate requirements by hackathon ---
+  const TEAMMATE_REQUIREMENTS = {
+    'Solid Work': { min: 0, max: 0 },
+    'Problem Solving': { min: 1, max: 2 },
+    'Green Entrepreneurial': { min: 2, max: 2 }
+  };
 
   // --- Solo hackathon detection ---
   const SOLO_HACKATHONS = ['Solid Work'];
@@ -30,13 +42,36 @@
     return SOLO_HACKATHONS.includes(value);
   }
 
+  // --- Get current hackathon from navbar theme ---
+  function getCurrentHackathon() {
+    const theme = document.body.dataset.theme || 'solidwork';
+    return themeToHackathon[theme] || 'Solid Work';
+  }
+
+  // --- Get teammate requirements for current hackathon ---
+  function getTeammateRequirements(hackathon = null) {
+    const hackathonName = hackathon || getCurrentHackathon();
+    return TEAMMATE_REQUIREMENTS[hackathonName] || { min: 0, max: 0 };
+  }
+
   // --- Toggle Teammates Section ---
   const soloBadge = document.getElementById('solo-badge');
   // Wrapper for teammates section elements to animate together
   const teammatesWrapper = [teammatesSectionTitle, teammatesContainer, addTeammateBtn];
 
+  // --- Update form title with hackathon name ---
+  function updateFormTitle(hackathonValue) {
+    const titleElement = document.querySelector('.registration .section-title');
+    if (titleElement) {
+      titleElement.textContent = hackathonValue;
+    }
+  }
+
   function toggleTeammatesSection(hackathonValue) {
     const solo = isSoloHackathon(hackathonValue);
+
+    // Update form title with hackathon name
+    updateFormTitle(hackathonValue);
 
     if (solo) {
       // Clear any existing teammates
@@ -56,12 +91,10 @@
         soloBadge.classList.add('visible');
       }
 
-      // Update form title
-      document.querySelector('.registration .section-title').textContent = 'Solo Registration';
       // Update leader section title
-      const leaderSectionTitle = document.querySelectorAll('.form-section-title')[1];
+      const leaderSectionTitle = document.querySelectorAll('.form-section-title')[0];
       if (leaderSectionTitle) {
-        leaderSectionTitle.innerHTML = '<span class="section-number">2</span> Your Information';
+        leaderSectionTitle.innerHTML = '<span class="section-number">1</span> Your Information';
       }
     } else {
       // Slide-show teammates UI with animation
@@ -75,12 +108,10 @@
         setTimeout(() => { soloBadge.style.display = 'none'; }, 400);
       }
 
-      // Restore form title
-      document.querySelector('.registration .section-title').textContent = 'Register Your Team';
       // Restore leader section title
-      const leaderSectionTitle = document.querySelectorAll('.form-section-title')[1];
+      const leaderSectionTitle = document.querySelectorAll('.form-section-title')[0];
       if (leaderSectionTitle) {
-        leaderSectionTitle.innerHTML = '<span class="section-number">2</span> Team Leader Information';
+        leaderSectionTitle.innerHTML = '<span class="section-number">1</span> Team Leader Information';
       }
     }
   }
@@ -103,8 +134,9 @@
 
   // --- Create Teammate Block ---
   function createTeammateBlock() {
-    if (teammateCount >= MAX_TEAMMATES) {
-      showMessage('Maximum of ' + MAX_TEAMMATES + ' teammates allowed.', 'error');
+    const requirements = getTeammateRequirements();
+    if (teammateCount >= requirements.max) {
+      showMessage('Maximum of ' + requirements.max + ' teammates allowed.', 'error');
       return;
     }
 
@@ -191,7 +223,7 @@
   // --- Collect Form Data ---
   function collectFormData() {
     const data = {
-      hackathon: sanitize(document.getElementById('hackathon-select').value),
+      hackathon: sanitize(getCurrentHackathon()),
       firstName: sanitize(document.getElementById('fname').value),
       lastName: sanitize(document.getElementById('lname').value),
       department: sanitize(document.getElementById('dept').value),
@@ -228,6 +260,15 @@
     if (!data.studentId) return 'Please enter your student ID.';
     if (!data.email) return 'Please enter your email.';
     if (!isValidEmail(data.email)) return 'Please enter a valid email address.';
+
+    // Check teammate count requirements
+    const requirements = getTeammateRequirements(data.hackathon);
+    if (data.teammates.length < requirements.min) {
+      return `This hackathon requires at least ${requirements.min} teammate${requirements.min !== 1 ? 's' : ''}.`;
+    }
+    if (data.teammates.length > requirements.max) {
+      return `This hackathon allows a maximum of ${requirements.max} teammate${requirements.max !== 1 ? 's' : ''}.`;
+    }
 
     for (let i = 0; i < data.teammates.length; i++) {
       const tm = data.teammates[i];
@@ -289,13 +330,17 @@
   // --- Event Listeners ---
   addTeammateBtn.addEventListener('click', createTeammateBlock);
 
-  // --- Hackathon selection change → toggle teammates ---
-  hackathonSelect.addEventListener('change', () => {
-    toggleTeammatesSection(hackathonSelect.value);
+  // --- Listen for theme changes and update form ---
+  // Watch for theme changes on the body element
+  const observer = new MutationObserver(() => {
+    const currentHackathon = getCurrentHackathon();
+    toggleTeammatesSection(currentHackathon);
   });
 
-  // Initialize on load (in case a hackathon is pre-selected)
-  toggleTeammatesSection(hackathonSelect.value);
+  observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+
+  // Initialize on load with current theme
+  toggleTeammatesSection(getCurrentHackathon());
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

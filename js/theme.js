@@ -240,13 +240,6 @@
     `;
   }
 
-  // --- Theme-to-form value mapping ---
-  const themeToFormValue = {
-    solidwork: 'Solid Work',
-    problemsolving: 'Problem Solving',
-    green: 'Green Entrepreneurial'
-  };
-
   // --- Switch Theme ---
   function switchTheme(themeName) {
     if (themeName === currentTheme) return;
@@ -268,22 +261,6 @@
     renderAbout(data);
     renderMotivation(data);
     renderPrizes(data);
-
-    // Sync the registration form hackathon dropdown
-    const hackathonSelect = document.getElementById('hackathon-select');
-    if (hackathonSelect && themeToFormValue[themeName]) {
-      hackathonSelect.value = themeToFormValue[themeName];
-      // Dispatch change event so form.js can react (e.g. toggle teammates)
-      hackathonSelect.dispatchEvent(new Event('change'));
-    }
-
-    // Auto-scroll to registration form so user sees the pre-selected hackathon
-    setTimeout(() => {
-      const regSection = document.getElementById('registration');
-      if (regSection) {
-        regSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 300);
 
     // Restart background particles
     cancelAnimationFrame(bgAnimFrame);
@@ -332,13 +309,6 @@
     renderPrizes(defaultData);
     initBgParticles('solidwork');
     animateBg();
-
-    // Sync form dropdown to default theme
-    const hackathonSelect = document.getElementById('hackathon-select');
-    if (hackathonSelect && themeToFormValue['solidwork']) {
-      hackathonSelect.value = themeToFormValue['solidwork'];
-      hackathonSelect.dispatchEvent(new Event('change'));
-    }
 
     // Initial scroll reveal
     setTimeout(handleScrollReveal, 200);
