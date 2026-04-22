@@ -132,6 +132,12 @@
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
+  // --- Validate Phone ---
+  function isValidPhone(phone) {
+    if (!phone) return false;
+    return /^\+?[0-9\s-]{7,20}$/.test(phone);
+  }
+
   // --- Create Teammate Block ---
   function createTeammateBlock() {
     const requirements = getTeammateRequirements();
@@ -187,6 +193,15 @@
           <input type="email" id="tm-email-${num}" name="tm_email_${num}" placeholder="email@example.com" required>
         </div>
       </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tm-phone-${num}">Phone</label>
+          <input type="tel" id="tm-phone-${num}" name="tm_phone_${num}" placeholder="+216 12345678" required>
+        </div>
+        <div class="form-group">
+          <!-- placeholder for layout -->
+        </div>
+      </div>
     `;
 
     teammatesContainer.appendChild(block);
@@ -230,6 +245,7 @@
       class: sanitize(document.getElementById('student-class').value),
       studentId: sanitize(document.getElementById('student-id').value),
       email: sanitize(document.getElementById('email').value),
+      phone: sanitize(document.getElementById('phone').value),
       teammates: []
     };
 
@@ -244,6 +260,8 @@
         class: sanitize(tmBlock.querySelector(`[name^="tm_class"]`).value),
         studentId: sanitize(tmBlock.querySelector(`[name^="tm_id"]`).value),
         email: sanitize(tmBlock.querySelector(`[name^="tm_email"]`).value)
+        ,
+        phone: sanitize(tmBlock.querySelector(`[name^="tm_phone"]`).value)
       });
     });
 
@@ -260,6 +278,8 @@
     if (!data.studentId) return 'Please enter your student ID.';
     if (!data.email) return 'Please enter your email.';
     if (!isValidEmail(data.email)) return 'Please enter a valid email address.';
+    if (!data.phone) return 'Please enter your phone number.';
+    if (!isValidPhone(data.phone)) return 'Please enter a valid phone number.';
 
     // Check teammate count requirements
     const requirements = getTeammateRequirements(data.hackathon);
@@ -278,6 +298,8 @@
       if (!isValidEmail(tm.email)) {
         return `Invalid email for Teammate #${i + 1}.`;
       }
+      if (!tm.phone) return `Please enter a phone number for Teammate #${i + 1}.`;
+      if (!isValidPhone(tm.phone)) return `Invalid phone number for Teammate #${i + 1}.`;
     }
 
     return null;
@@ -295,6 +317,7 @@
       class: data.class,
       studentId: data.studentId,
       email: data.email,
+      phone: data.phone,
       teammateCount: data.teammates.length
     };
 
@@ -307,6 +330,7 @@
       payload[`tm${n}_class`] = tm.class;
       payload[`tm${n}_studentId`] = tm.studentId;
       payload[`tm${n}_email`] = tm.email;
+      payload[`tm${n}_phone`] = tm.phone;
     });
 
     const response = await fetch(GOOGLE_SCRIPT_URL, {
