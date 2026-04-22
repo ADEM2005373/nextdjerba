@@ -8,7 +8,7 @@
   // ===========================================================
   // IMPORTANT: Replace this URL with your Google Apps Script URL
   // ===========================================================
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlfBeeE-7fhwrxlRb-YvNj_K0AP-uxx49dRPLiT7KpUYtlhxUxEL6kGpgujdO5y0gi/exec';
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJOQq9_G66uaLP65dJzN9tOzhxhDQ2T61hHKrerFSgfY6FQGpqaB6wgvxpQqgS7OKp/exec';
 
   const form = document.getElementById('registration-form');
   const addTeammateBtn = document.getElementById('add-teammate');
@@ -37,9 +37,14 @@
 
   // --- Solo hackathon detection ---
   const SOLO_HACKATHONS = ['Solid Work'];
+  const CLOSED_HACKATHONS = ['Solid Work'];
 
   function isSoloHackathon(value) {
     return SOLO_HACKATHONS.includes(value);
+  }
+
+  function isHackathonClosed(value) {
+    return CLOSED_HACKATHONS.includes(value);
   }
 
   // --- Get current hackathon from navbar theme ---
@@ -67,8 +72,32 @@
     }
   }
 
+  function setFormDisabledState(disabled) {
+    const fields = form.querySelectorAll('input, select, textarea, button');
+
+    fields.forEach((field) => {
+      if (field.id === 'submit-btn') {
+        field.disabled = disabled;
+        field.textContent = disabled ? 'PARTICIPANT NUMBER IS COMPLETED' : 'SUBMIT REGISTRATION';
+        field.classList.toggle('is-closed', disabled);
+        return;
+      }
+
+      if (field.id === 'add-teammate') {
+        field.disabled = disabled;
+        field.classList.toggle('is-closed', disabled);
+        return;
+      }
+
+      field.disabled = disabled;
+    });
+
+    form.classList.toggle('form-closed', disabled);
+  }
+
   function toggleTeammatesSection(hackathonValue) {
     const solo = isSoloHackathon(hackathonValue);
+    const closed = isHackathonClosed(hackathonValue);
 
     // Update form title with hackathon name
     updateFormTitle(hackathonValue);
@@ -114,6 +143,14 @@
         leaderSectionTitle.innerHTML = '<span class="section-number">1</span> Team Leader Information';
       }
     }
+
+    if (closed) {
+      showMessage('Participant number is completed for Solid Work.', 'error');
+    } else {
+      hideMessage();
+    }
+
+    setFormDisabledState(closed);
   }
 
   // --- Rate limiting ---
@@ -230,6 +267,7 @@
       class: sanitize(document.getElementById('student-class').value),
       studentId: sanitize(document.getElementById('student-id').value),
       email: sanitize(document.getElementById('email').value),
+      phone: sanitize(document.getElementById('phone').value),
       teammates: []
     };
 
@@ -259,6 +297,7 @@
     if (!data.class) return 'Please enter your class.';
     if (!data.studentId) return 'Please enter your student ID.';
     if (!data.email) return 'Please enter your email.';
+    if (!data.phone) return 'Please enter your phone number.';
     if (!isValidEmail(data.email)) return 'Please enter a valid email address.';
 
     // Check teammate count requirements
@@ -283,9 +322,7 @@
     return null;
   }
 
-  // --- Submit to Google Sheets ---
-  async function submitToGoogleSheets(data) {
-    // Flatten data for spreadsheet
+  function buildPayload(data) {
     const payload = {
       timestamp: new Date().toISOString(),
       hackathon: data.hackathon,
@@ -295,10 +332,10 @@
       class: data.class,
       studentId: data.studentId,
       email: data.email,
+      phone: data.phone,
       teammateCount: data.teammates.length
     };
 
-    // Add teammate data
     data.teammates.forEach((tm, i) => {
       const n = i + 1;
       payload[`tm${n}_firstName`] = tm.firstName;
@@ -309,22 +346,28 @@
       payload[`tm${n}_email`] = tm.email;
     });
 
-    const response = await fetch(GOOGLE_SCRIPT_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
-      body: JSON.stringify(payload)
+    return payload;
+  }
+
+  // --- Submit to Google Sheets without needing a local server ---
+  async function submitToGoogleSheets(data) {
+    const payload = buildPayload(data);
+    const body = new URLSearchParams();
+
+    Object.entries(payload).forEach(([key, value]) => {
+      body.append(key, value == null ? '' : String(value));
     });
 
-    if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
-        throw new Error('Unauthorized. Please ensure the Apps Script Web App "Who has access" is set to "Anyone".');
-      }
-      throw new Error(`Network response was not ok: ${response.status}`);
-    }
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      },
+      body: body.toString()
+    });
 
-    return await response.json();
+    return { success: true };
   }
 
   // --- Event Listeners ---
@@ -345,6 +388,11 @@
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideMessage();
+
+    if (isHackathonClosed(getCurrentHackathon())) {
+      showMessage('Participant number is completed for Solid Work.', 'error');
+      return;
+    }
 
     // Rate limiting
     const now = Date.now();
