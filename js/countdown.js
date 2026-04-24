@@ -5,8 +5,8 @@
 (function () {
   'use strict';
 
-  // Registration deadline: Friday, April 25, 2026 at 12:00 PM
-  const registrationDeadline = new Date(2026, 3, 25, 12, 0, 0).getTime();
+  // Registration is ended, so force the timer to 00:00:00:00.
+  const registrationDeadline = Date.now() - 1000;
 
   const daysElement = document.getElementById('days');
   const hoursElement = document.getElementById('hours');

@@ -16,6 +16,11 @@
   const formMessage = document.getElementById('form-message');
   const submitBtn = document.getElementById('submit-btn');
 
+  // Registration form removed/disabled on the page.
+  if (!form) {
+    return;
+  }
+
   // Teammates section title (section #2, now that hackathon selection was removed)
   const teammatesSectionTitle = document.querySelectorAll('.form-section-title')[1]; // 2nd section title
 

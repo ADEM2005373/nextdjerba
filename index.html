@@ -103,8 +103,8 @@
         <div class="countdown-content">
           <div class="countdown-header">
             <span class="section-label">Time Matters</span>
-            <h2 class="section-title">Registration Closes</h2>
-            <p class="countdown-subtitle">Secure your spot before it's too late!</p>
+            <h2 class="section-title">Registration Ended</h2>
+            <p class="countdown-subtitle">Registration is now closed.</p>
           </div>
           <div class="countdown-timer">
             <div class="countdown-box">
@@ -124,8 +124,8 @@
               <div class="countdown-label">Seconds</div>
             </div>
           </div>
-          <p class="countdown-deadline">🎯 Friday, April 25, 2026 at 12:00 PM</p>
-          <a href="#registration" class="countdown-cta">Register Your Team Now</a>
+          <p class="countdown-deadline">Registration ended.</p>
+          <a href="#registration" class="countdown-cta">Registration Ended</a>
         </div>
       </div>
     </section>
@@ -248,88 +248,16 @@
       <div class="container">
         <div style="text-align: center; margin-bottom: 48px;">
           <span class="section-label">Join the Battle</span>
-          <h2 class="section-title">Register Your Team</h2>
+          <h2 class="section-title">Registration Ended</h2>
           <div class="solo-badge" id="solo-badge" style="display: none;">
             🎯 Solo Challenge — No teammates needed
           </div>
         </div>
 
         <div class="form-wrapper">
-          <form id="registration-form" novalidate>
-
-            <!-- Team Leader Info -->
-            <div class="form-section-title">
-              <span class="section-number">1</span>
-              Team Leader Information
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="fname">First Name</label>
-                <input type="text" id="fname" name="firstName" placeholder="Your first name" required>
-              </div>
-              <div class="form-group">
-                <label for="lname">Last Name</label>
-                <input type="text" id="lname" name="lastName" placeholder="Your last name" required>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="dept">Department</label>
-                <select id="dept" name="department" required>
-                  <option value="">Select department</option>
-                  <option value="IT">IT</option>
-                  <option value="GE">GE</option>
-                  <option value="GM">ME</option>
-                  <option value="GES">GES</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="student-class">Class</label>
-                <input type="text" id="student-class" name="class" placeholder="e.g. 2CP, 1CS" required>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="student-id">Student ID</label>
-                <input type="text" id="student-id" name="studentId" placeholder="Your student ID" required>
-              </div>
-              <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" name="phone" placeholder="12 345 678" required>
-              </div>
-            </div>
-
-            <!-- Teammates -->
-            <div class="form-section-title">
-              <span class="section-number">2</span>
-              Teammates
-            </div>
-
-            <div id="teammates-container">
-              <!-- Teammate blocks added dynamically -->
-            </div>
-
-            <button type="button" class="add-teammate-btn" id="add-teammate">
-              + Add Teammate
-            </button>
-
-            <!-- Submit -->
-            <button type="submit" class="submit-btn" id="submit-btn">
-              Submit Registration
-            </button>
-
-            <div class="form-message" id="form-message"></div>
-          </form>
+          <div class="form-message success" style="display: block; text-align: center; margin-top: 0;">
+            Registration ended
+          </div>
         </div>
       </div>
     </section>
