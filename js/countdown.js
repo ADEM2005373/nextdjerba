@@ -5,8 +5,20 @@
 (function () {
   'use strict';
 
-  // Registration is ended, so force the timer to 00:00:00:00.
-  const registrationDeadline = Date.now() - 1000;
+  // Read deadline from HTML: <section id="countdown" data-deadline="...">
+  // Fallback: 7 days from now (keeps the timer working in dev).
+  const countdownSection = document.getElementById('countdown');
+  const deadlineAttr = countdownSection ? countdownSection.dataset.deadline : null;
+  const parsedDeadline = deadlineAttr ? Date.parse(deadlineAttr) : NaN;
+  const registrationDeadline = Number.isFinite(parsedDeadline)
+    ? parsedDeadline
+    : Date.now() + 7 * 24 * 60 * 60 * 1000;
+
+  const deadlineLabel = document.getElementById('countdown-deadline');
+  if (deadlineLabel) {
+    const d = new Date(registrationDeadline);
+    deadlineLabel.textContent = `🎯 Deadline: ${d.toLocaleString()}`;
+  }
 
   const daysElement = document.getElementById('days');
   const hoursElement = document.getElementById('hours');

@@ -42,7 +42,7 @@
 
   // --- Solo hackathon detection ---
   const SOLO_HACKATHONS = ['Solid Work'];
-  const CLOSED_HACKATHONS = ['Solid Work'];
+  const CLOSED_HACKATHONS = [];
 
   function isSoloHackathon(value) {
     return SOLO_HACKATHONS.includes(value);
